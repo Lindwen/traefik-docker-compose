@@ -61,3 +61,9 @@ docker compose down
 ```bash
 docker compose logs -f
 ```
+
+---
+
+### Thanks
+
+* [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
