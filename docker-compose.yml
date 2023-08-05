@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.dashboard.middlewares=security-headers@file"
       # Uncomment the following lines to enable basic auth for the dashboard
       #- "traefik.http.routers.dashboard.middlewares=auth"
-      #- "traefik.http.middlewares.auth.basicauth.users=user:password" # password generated with htpasswd (Bcrypt) and double $
+      #- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
     networks:
       - traefik-net
 
