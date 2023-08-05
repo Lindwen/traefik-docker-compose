@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      #- 8080:8080 # The Web UI (enabled by --api.insecure=true)
+    volumes:
+      - ./traefik.toml:/traefik.toml:ro
+      - ./configuration:/configuration:ro
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+    networks:
+      - traefik-net
+
+  website:
+    container_name: website
+    image: httpd:alpine
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.website.rule=Host(`website.domain.tld`)"
+      - "traefik.http.routers.website.entrypoints=websecure"
+      - "traefik.http.routers.website.tls.options=mintls12@file"
+      - "traefik.http.routers.website.middlewares=security-headers@file"
+    volumes:
+      - ./data:/usr/local/apache2/htdocs/:ro
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    name: traefik-net
