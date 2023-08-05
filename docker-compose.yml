@@ -16,11 +16,15 @@ services:
       - ./acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.primaryweb.tls.options=mintls12@file"
-      - "traefik.http.routers.primaryweb.middlewares=security-headers@file"
+      - "traefik.http.routers.dashboard.tls.options=mintls12@file"
+      - "traefik.http.routers.dashboard.middlewares=security-headers@file"
+      # Uncomment the following lines to enable basic auth for the dashboard
+      #- "traefik.http.routers.dashboard.middlewares=auth"
+      #- "traefik.http.middlewares.auth.basicauth.users=user:password" # password generated with htpasswd (Bcrypt) and double $
     networks:
       - traefik-net
 

@@ -21,7 +21,7 @@
   [providers.docker]
     watch = true
     exposedByDefault = false
-    network = "proxy-net"
+    network = "traefik-net"
   [providers.file]
     watch = true
     directory = "/configurations"
