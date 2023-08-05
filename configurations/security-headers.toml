@@ -13,7 +13,8 @@
     contentTypeNosniff = true
     browserXSSFilter = true
     referrerPolicy = "same-origin"
-    featurePolicy = "camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+    permissionsPolicy = "camera=(), geolocation=(), microphone=(), payment=(), usb=(), vr=()"
+    contentSecurityPolicy = "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
     [http.middlewares.security-headers.headers.customResponseHeaders]
       X-Robots-Tag = "none,noarchive,nosnippet,notranslate,noimageindex"
       Server = "Oh no, no server here :/"
