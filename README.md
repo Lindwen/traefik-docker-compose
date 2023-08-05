@@ -57,6 +57,16 @@ echo "Hello World" > data/index.html
 contentSecurityPolicy = "default-src 'none'; script-src 'self' 'usafe-inline' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
 ```
 
+6. WARNING : the mintls12@file block ssl activation by letsencrypt.
+If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the containers.
+
+```yml
+and
+
+```toml
+# - "traefik.http.routers.website.tls.options=mintls12@file"
+```
+
 ### Start
 
 To start the containers:

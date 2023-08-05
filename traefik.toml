@@ -1,8 +1,8 @@
 [api]
   dashboard = true
 
-#[log]
-#  level = "DEBUG"
+[log]
+  level = "DEBUG"
 
 [entryPoints]
   [entryPoints.web]

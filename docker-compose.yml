@@ -6,6 +6,8 @@ services:
     image: traefik:v2.10
     container_name: traefik
     restart: unless-stopped
+    environment:
+      - TZ=Eurpoe/Paris
     ports:
       - 80:80
       - 443:443
