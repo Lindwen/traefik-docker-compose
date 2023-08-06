@@ -60,9 +60,6 @@ contentSecurityPolicy = "default-src 'none'; script-src 'self' 'usafe-inline' ht
 6. WARNING : the mintls12@file block ssl activation by letsencrypt.
 If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the containers.
 
-```yml
-and
-
 ```toml
 # - "traefik.http.routers.website.tls.options=mintls12@file"
 ```
