@@ -56,7 +56,8 @@ echo "Hello World" > data/index.html
 # Change the domain name for the traefik and web service
 - "traefik.http.routers.<service>.rule=Host(`YOUR_DOMAIN_NAME`)"
 # Add auth for Traefik dashboard if needed
-- "traefik.http.middlewares.<service>.auth.basic.users=<username>:<password>"
+- "traefik.http.routers.dashboard.middlewares=auth"
+- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>"
 ```
 
 5. Check the middleware in the `configuration/security-headers.toml` file:
