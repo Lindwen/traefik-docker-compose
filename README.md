@@ -1,5 +1,14 @@
 # traefik-docker-compose
 
+Streamline microservices deployment with Traefik and Docker Compose.
+And secure your website with security headers.
+
+* Score on : [securityheaders.com](https://securityheaders.com/)
+![securityheaders_score](docs/img/securityheaders_score.png)
+
+* Score on : [observatory.mozilla.org](https://observatory.mozilla.org/)
+![observatory_score](docs/img/observatory_score.png)
+
 ## Traefik
 
 Traefik is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy. Traefik integrates with your existing infrastructure components and configures itself automatically and dynamically.
@@ -26,14 +35,14 @@ git clone https://github.com/Lindwen/traefik-docker-compose.git
 cd traefik-docker-compose
 ```
 
-2. Create a data directory for the web service and an index.html file:
+2. Create a data directory for the web service and an `index.html` file:
 
 ```bash
 mkdir data
 echo "Hello World" > data/index.html
 ```
 
-3. Configure the traefik.toml file by changing the email address:
+3. Configure the `traefik.toml` file by changing the email address:
 
 ```toml
 # Change the email address
@@ -41,7 +50,7 @@ echo "Hello World" > data/index.html
   email = "YOUR_EMAIL_ADDRESS"
 ```
 
-4. Configure the docker-compose.yml file by modifying the domain name for Traefik and the web service, and add authentication for the Traefik dashboard if needed:
+4. Configure the `docker-compose.yml` file by modifying the domain name for Traefik and the web service, and add authentication for the Traefik dashboard if needed:
 
 ```yml
 # Change the domain name for the traefik and web service
@@ -50,14 +59,14 @@ echo "Hello World" > data/index.html
 - "traefik.http.middlewares.<service>.auth.basic.users=<username>:<password>"
 ```
 
-5. Check the middleware in the configuration/security-headers.toml file:
+5. Check the middleware in the `configuration/security-headers.toml` file:
 
 ```toml
 # This middleware is very restrictive. You may need to customize it according to your needs, but it's a good starting point to secure your website and the Traefik dashboard.
-contentSecurityPolicy = "default-src 'none'; script-src 'self' 'usafe-inline' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+contentSecurityPolicy = "default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
 ```
 
-6. WARNING : the mintls12@file block ssl activation by letsencrypt.
+6. ⚠️ WARNING: the `mintls12@file` block ssl activation by letsencrypt.
 If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the containers.
 
 ```toml
