@@ -67,6 +67,9 @@ chmod 600 acme.json
 ```toml
 # This middleware is very restrictive. You may need to customize it according to your needs, but it's a good starting point to secure your website and the Traefik dashboard.
 contentSecurityPolicy = "default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+# For somes websites, you may need to add the following properties:
+script-src 'self' 'unsafe-inline' https://traefik.github.io;
+style-src 'self' 'unsafe-inline';
 ```
 
 6. ⚠️ WARNING: the `mintls12@file` block ssl activation by letsencrypt.
