@@ -35,11 +35,13 @@ git clone https://github.com/Lindwen/traefik-docker-compose.git
 cd traefik-docker-compose
 ```
 
-2. Create a data directory for the web service and an `index.html` file:
+2. Create a data directory for the web service and an `index.html` file and create acme.json file for traefik:
 
 ```bash
 mkdir data
 echo "Hello World" > data/index.html
+touch acme.json
+chmod 600 acme.json
 ```
 
 3. Configure the `traefik.toml` file by changing the email address:

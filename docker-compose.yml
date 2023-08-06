@@ -14,7 +14,7 @@ services:
       #- 8080:8080 # The Web UI (enabled by --api.insecure=true)
     volumes:
       - ./traefik.toml:/traefik.toml:ro
-      - ./configuration:/configuration:ro
+      - ./configurations:/configurations:ro
       - ./acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
