@@ -76,6 +76,16 @@ If you want to use ssl, you need to comment this line in docker-compose.yml and 
 # - "traefik.http.routers.website.tls.options=mintls12@file"
 ```
 
+7. DNS configuration
+
+For this example, I made the following DNS configuration:
+
+```bash
+# A record
+*.domain.tld A IP_ADDRESS_OF_YOUR_SERVER
+```
+To check the propagation of your DNS, you can use [dnschecker.org](https://dnschecker.org/) or [whatsmydns.net](https://www.whatsmydns.net/).
+
 ### Start
 
 To start the containers:
