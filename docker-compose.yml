@@ -22,7 +22,8 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.options=mintls12@file"
+      # Uncomment the following line to enable TLS 1.2 for the dashboard after the first run
+      #- "traefik.http.routers.dashboard.tls.options=mintls12@file"
       - "traefik.http.routers.dashboard.middlewares=security-headers@file"
       # Uncomment the following lines to enable basic auth for the dashboard
       #- "traefik.http.routers.dashboard.middlewares=auth"
@@ -38,7 +39,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.website.rule=Host(`website.domain.tld`)"
       - "traefik.http.routers.website.entrypoints=websecure"
-      - "traefik.http.routers.website.tls.options=mintls12@file"
+      #- "traefik.http.routers.website.tls.options=mintls12@file"
       - "traefik.http.routers.website.middlewares=security-headers@file"
     volumes:
       - ./data:/usr/local/apache2/htdocs/:ro
