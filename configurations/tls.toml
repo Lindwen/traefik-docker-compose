@@ -1,6 +1,7 @@
 [tls.options]
   [tls.options.mintls12]
     minVersion = "VersionTLS12"
+    maxVersion = "VersionTLS13"
 
     cipherSuites = [
         "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
