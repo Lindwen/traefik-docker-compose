@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+
+  example:
+    container_name: example
+    image: httpd:alpine
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.example.rule=Host(`example.domain.tld`)"
+      - "traefik.http.routers.example.entrypoints=websecure"
+      #- "traefik.http.routers.example.tls.options=tls@file"
+      - "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
+      - "traefik.http.middlewares.grafana-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
+    volumes:
+      - ./data:/usr/local/apache2/htdocs/:ro
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
