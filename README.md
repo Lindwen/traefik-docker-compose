@@ -144,3 +144,4 @@ Your feedback is valuable, and we appreciate your contributions to making this p
 ### Thanks
 
 * [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
+* [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file
