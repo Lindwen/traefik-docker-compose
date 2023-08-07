@@ -58,38 +58,40 @@ vi docker-compose.yml
 ```
 
 ```yml
-# Change the domain name
+# For this example service name is: dashboard (for traefik dashboard)
+
+# [required] Change the domain name
 - "traefik.http.routers.<service>.rule=Host(`YOUR_DOMAIN_NAME`)"
 # example:
-- "traefik.http.routers.example.rule=Host(`test.example.com`)"
+- "traefik.http.routers.dashboard.rule=Host(`traefik.example.com`)"
 
-# Port configuration if the container don't expose port 80
-- "traefik.http.services.<service>.loadbalancer.server.port=<port>"
-# example: (3000 = grafana)
-- "traefik.http.services.example.loadbalancer.server.port=3000"
-
-
-# Add auth (just for traefik)
+# [required] Add auth
 - "traefik.http.routers.<service>.middlewares=auth"
 - "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
 # example:
-- "traefik.http.routers.example.middlewares=auth"
+- "traefik.http.routers.dashboard.middlewares=auth"
 - "traefik.http.middlewares.auth.basicauth.users=Example:$$2a$$10$$Bls.hNkCW3m4lBz9a592IOfom6U0dmFvIP9UUz.4VWbWF0x8Kn3WG"
 
-# Add contentSecurityPolicy
+# [required] Add contentSecurityPolicy
 # You need to custom this
 - "traefik.http.routers.<service>.middlewares=security-headers@file, <service>-csp"
 - "traefik.http.middlewares.<service>-csp.headers.contentSecurityPolicy=<policies>"
 # example:
-- "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
-- "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+- "traefik.http.routers.dashboard.middlewares=security-headers@file, dashboard-csp"
+- "traefik.http.middlewares.dashboard-csp.headers.contentSecurityPolicy=default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+
+# ----- Optional ----- #
+# Port configuration if the container don't expose port 80
+- "traefik.http.services.<service>.loadbalancer.server.port=<port>"
+# example: (3000 = grafana)
+- "traefik.http.services.grafana.loadbalancer.server.port=3000"
 ```
 
 5. ⚠️ WARNING: the `tls@file` block ssl activation by letsencrypt.
-If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the containers.
+If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the container.
 
 ```toml
-# - "traefik.http.routers.<service>.tls.options=tls@file"
+# - "traefik.http.routers.dashboard.tls.options=tls@file"
 ```
 
 7. DNS configuration
@@ -131,6 +133,26 @@ To view live logs:
 ```bash
 docker compose logs -f
 ```
+
+### Example website
+
+1. Go to example dir
+2. Edit `docker-compose.yml`
+```yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.example.rule=Host(`example.domain.tld`)"   # --> Change domain
+      - "traefik.http.routers.example.entrypoints=websecure"
+      #- "traefik.http.routers.example.tls.options=tls@file"
+      - "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
+      - "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
+```
+3. Launch : `docker compose up -d`
+4. Uncomment 
+```yml
+- "traefik.http.routers.example.tls.options=tls@file"
+```
+5. Launch : `docker compose up -d`
 
 ## Need Help?
 

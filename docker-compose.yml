@@ -19,7 +19,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.tld`)" # Change domain
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       # Uncomment the following line to enable TLS 1.2 for the dashboard after the first run

@@ -12,7 +12,7 @@ services:
       - "traefik.http.routers.example.entrypoints=websecure"
       #- "traefik.http.routers.example.tls.options=tls@file"
       - "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
-      - "traefik.http.middlewares.grafana-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
+      - "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
     volumes:
       - ./data:/usr/local/apache2/htdocs/:ro
     networks:
