@@ -63,6 +63,12 @@ vi docker-compose.yml
 # example:
 - "traefik.http.routers.example.rule=Host(`test.example.com`)"
 
+# Port configuration if the container don't expose port 80
+- "traefik.http.services.<service>.loadbalancer.server.port=<port>"
+# example: (3000 = grafana)
+- "traefik.http.services.example.loadbalancer.server.port=3000"
+
+
 # Add auth (just for traefik)
 - "traefik.http.routers.<service>.middlewares=auth"
 - "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
