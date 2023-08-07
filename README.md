@@ -82,7 +82,7 @@ vi docker-compose.yml
 - "traefik.http.middlewares.<service>-csp.headers.contentSecurityPolicy=<policies>"
 # example:
 - "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
-- "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
+- "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
 ```
 
 5. ⚠️ WARNING: the `tls@file` block ssl activation by letsencrypt.
