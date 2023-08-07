@@ -35,11 +35,9 @@ git clone https://github.com/Lindwen/traefik-docker-compose.git
 cd traefik-docker-compose
 ```
 
-2. Create a data directory for the web service and an `index.html` file and create acme.json file for traefik:
+1. Create `acme.json` file for traefik:
 
 ```bash
-mkdir data
-echo "Hello World" > data/index.html
 touch acme.json
 chmod 600 acme.json
 ```
@@ -52,31 +50,40 @@ chmod 600 acme.json
   email = "YOUR_EMAIL_ADDRESS"
 ```
 
-4. Configure the `docker-compose.yml` file by modifying the domain name for Traefik and the web service, and add authentication for the Traefik dashboard if needed:
+4. Configure labels:
+
+Edit `docker-compose.yml` and `example/docker-compose.yml` :
+```bash
+vi docker-compose.yml
+```
 
 ```yml
-# Change the domain name for the traefik and web service
+# Change the domain name
 - "traefik.http.routers.<service>.rule=Host(`YOUR_DOMAIN_NAME`)"
-# Add auth for Traefik dashboard if needed
-- "traefik.http.routers.dashboard.middlewares=auth"
-- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>"
+# example:
+- "traefik.http.routers.example.rule=Host(`test.example.com`)"
+
+# Add auth (just for traefik)
+- "traefik.http.routers.<service>.middlewares=auth"
+- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
+# example:
+- "traefik.http.routers.example.middlewares=auth"
+- "traefik.http.middlewares.auth.basicauth.users=Example:$$2a$$10$$Bls.hNkCW3m4lBz9a592IOfom6U0dmFvIP9UUz.4VWbWF0x8Kn3WG"
+
+# Add contentSecurityPolicy
+# You need to custom this
+- "traefik.http.routers.<service>.middlewares=security-headers@file, <service>-csp"
+- "traefik.http.middlewares.<service>-csp.headers.contentSecurityPolicy=<policies>"
+# example:
+- "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
+- "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
 ```
 
-5. Check the middleware in the `configuration/security-headers.toml` file:
-
-```toml
-# This middleware is very restrictive. You may need to customize it according to your needs, but it's a good starting point to secure your website and the Traefik dashboard.
-contentSecurityPolicy = "default-src 'none'; script-src 'self' https://traefik.github.io; connect-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none';"
-# For somes websites, you may need to add the following properties:
-script-src 'self' 'unsafe-inline' https://traefik.github.io;
-style-src 'self' 'unsafe-inline';
-```
-
-6. ⚠️ WARNING: the `mintls12@file` block ssl activation by letsencrypt.
+5. ⚠️ WARNING: the `tls@file` block ssl activation by letsencrypt.
 If you want to use ssl, you need to comment this line in docker-compose.yml and uncomment after the first start of the containers.
 
 ```toml
-# - "traefik.http.routers.website.tls.options=mintls12@file"
+# - "traefik.http.routers.<service>.tls.options=tls@file"
 ```
 
 7. DNS configuration
@@ -91,9 +98,15 @@ To check the propagation of your DNS, you can use [dnschecker.org](https://dnsch
 
 ### Start
 
-To start the containers:
+To start traefik:
 
 ```bash
+docker compose up -d
+```
+
+To start the example container:
+```bash
+cd example
 docker compose up -d
 ```
 
@@ -131,3 +144,4 @@ Your feedback is valuable, and we appreciate your contributions to making this p
 ### Thanks
 
 * [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
+* [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file
