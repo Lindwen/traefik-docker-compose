@@ -2,17 +2,16 @@ version: '3'
 
 services:
 
-  example:
-    container_name: example
+  website:
+    container_name: ${service}
     image: httpd:alpine
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.example.rule=Host(`example.domain.tld`)"
-      - "traefik.http.routers.example.entrypoints=websecure"
-      #- "traefik.http.routers.example.tls.options=tls@file"
-      - "traefik.http.routers.example.middlewares=security-headers@file, example-csp"
-      - "traefik.http.middlewares.example-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
+      - "traefik.http.routers.${service}.rule=Host(`${domain}`)"
+      - "traefik.http.routers.${service}.entrypoints=websecure"
+      - "traefik.http.routers.${SERVICE}.middlewares=${SERVICE}-csp"
+      - "traefik.http.middlewares.${SERVICE}-csp.headers.contentSecurityPolicy=script-src 'self'; style-src 'self';"
     volumes:
       - ./data:/usr/local/apache2/htdocs/:ro
     networks:
