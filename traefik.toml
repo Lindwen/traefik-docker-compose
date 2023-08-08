@@ -14,8 +14,11 @@
 
   [entryPoints.websecure]
     address = ":443"
+    [entryPoints.websecure.http]
+      middlewares = ["security-headers@file"]
     [entryPoints.websecure.http.tls]
       certResolver = "letsencrypt"
+      options = "tls@file"
 
 [providers]
   [providers.docker]
