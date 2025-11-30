@@ -3,12 +3,6 @@
 Streamline microservices deployment with Traefik and Docker Compose.
 And secure your website with security headers.
 
-* Score on : [securityheaders.com](https://securityheaders.com/)
-![securityheaders_score](docs/img/securityheaders_score.png)
-
-* Score on : [observatory.mozilla.org](https://observatory.mozilla.org/)
-![observatory_score](docs/img/observatory_score.png)
-
 ## Traefik
 
 Traefik is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy. Traefik integrates with your existing infrastructure components and configures itself automatically and dynamically.
@@ -42,34 +36,13 @@ touch acme.json
 chmod 600 acme.json
 ```
 
-2. Configure the `traefik.toml` file by changing the email address:
+2. Copy `.env.example` to `.env` and edit the variables
 
-```toml
-# Change the email address
-[certificatesResolvers.letsencrypt.acme]
-  email = "YOUR_EMAIL_ADDRESS"
-```
-
-3. Configure labels:
-
-Edit `docker-compose.yml` and `example/docker-compose.yml` :
 ```bash
-vi docker-compose.yml
+cp .env.example .env
 ```
 
-```yml
-# [required] Change the domain name
-- "traefik.http.routers.<service>.rule=Host(`YOUR_DOMAIN_NAME`)"
-# example:
-- "traefik.http.routers.dashboard.rule=Host(`traefik.example.com`)"
-
-# [required] Add auth
-- "traefik.http.routers.<service>.middlewares=auth"
-- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
-# example:
-- "traefik.http.routers.dashboard.middlewares=auth"
-- "traefik.http.middlewares.auth.basicauth.users=Example:$$2a$$10$$Bls.hNkCW3m4lBz9a592IOfom6U0dmFvIP9UUz.4VWbWF0x8Kn3WG"
-```
+3. Edit `traefik.yml` and `configurations/security-headers.yml` and `configurations/tls.yml` to your needs
 
 ### Start
 
@@ -96,20 +69,12 @@ docker compose logs -f
 ```
 
 You can go to check your website to:
-`https://traefik.example.com`
+`https://${DOMAIN}`
 And register with your user / password
 
-### Example website
+### Add a service to the proxy
 
-1. Go to example dir: `traefik-docker-compose/example`
-2. Edit `.env` (remove .dist)
-```yml
-# The service name (for example "website")
-service=
-# The domain name (for example "website.domain.tld")
-domain=
-```
-3. Launch : `docker compose up -d`
+Need to be written.
 
 ## Need Help?
 
@@ -128,5 +93,5 @@ Your feedback is valuable, and we appreciate your contributions to making this p
 
 ### Thanks
 
-* [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
-* [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file
+- [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
+- [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file

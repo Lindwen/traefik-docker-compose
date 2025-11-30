@@ -1,0 +1,35 @@
+---
+services:
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+      SCW_ACCESS_KEY: ${SCW_ACCESS_KEY}
+      SCW_SECRET_KEY: ${SCW_SECRET_KEY}
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+    volumes:
+      - ./traefik.yml:/traefik.yml:ro
+      - ./configurations:/configurations:ro
+      - ./acme.json:/acme.json:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      # --- WatchTower ---
+      com.centurylinklabs.watchtower.enable: true
+      # --- Traefik ---
+      traefik.enable: true
+      traefik.http.routers.traefik-dashboard.rule: Host(`${DOMAIN}`)
+      traefik.http.routers.traefik-dashboard.service: api@internal
+      traefik.http.routers.traefik-dashboard.entrypoints: websecure
+      traefik.http.routers.traefik-dashboard.middlewares: auth
+      traefik.http.middlewares.auth.basicauth.users: ${USERNAME}:${PASSWORD}
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    name: proxy-net
+    external: true
