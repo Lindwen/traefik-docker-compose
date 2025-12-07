@@ -1,132 +1,120 @@
 # traefik-docker-compose
 
-Streamline microservices deployment with Traefik and Docker Compose.
-And secure your website with security headers.
+Ce repository contient ma configuration de Traefik pour mon serveur.
+Vous pouvez aussi l'utiliser pour votre serveur.
 
-* Score on : [securityheaders.com](https://securityheaders.com/)
-![securityheaders_score](docs/img/securityheaders_score.png)
+## Utilisation
 
-* Score on : [observatory.mozilla.org](https://observatory.mozilla.org/)
-![observatory_score](docs/img/observatory_score.png)
-
-## Traefik
-
-Traefik is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy. Traefik integrates with your existing infrastructure components and configures itself automatically and dynamically.
-
-## Docker Compose
-
-Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services.
-
-## Usage
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-
-### Configuration
-
-1. Clone the repository and navigate to it:
+1. Cloner le repository
 
 ```bash
+# HTTPS
 git clone https://github.com/Lindwen/traefik-docker-compose.git
+# SSH
+git clone git@github.com:Lindwen/traefik-docker-compose.git
+
 cd traefik-docker-compose
 ```
 
-1. Create `acme.json` file for traefik:
+2. Créer un fichier `.env`
+
+```bash
+cp .env.example .env
+vi .env
+```
+
+```env
+DOMAIN=proxy.domain.tld
+USERNAME=admin
+PASSWORD=
+```
+
+- `DOMAIN` : le domaine de votre proxy
+- `USERNAME` : le nom d'utilisateur de votre dashboard
+- `PASSWORD` : le mot de passe de votre dashboard (généré avec htpasswd et double $)
+
+3. Créer un fichier `acme.json`
 
 ```bash
 touch acme.json
 chmod 600 acme.json
 ```
 
-2. Configure the `traefik.toml` file by changing the email address:
-
-```toml
-# Change the email address
-[certificatesResolvers.letsencrypt.acme]
-  email = "YOUR_EMAIL_ADDRESS"
-```
-
-3. Configure labels:
-
-Edit `docker-compose.yml` and `example/docker-compose.yml` :
-```bash
-vi docker-compose.yml
-```
-
-```yml
-# [required] Change the domain name
-- "traefik.http.routers.<service>.rule=Host(`YOUR_DOMAIN_NAME`)"
-# example:
-- "traefik.http.routers.dashboard.rule=Host(`traefik.example.com`)"
-
-# [required] Add auth
-- "traefik.http.routers.<service>.middlewares=auth"
-- "traefik.http.middlewares.auth.basicauth.users=<username>:<password>" # password generated with htpasswd (Bcrypt) and double $
-# example:
-- "traefik.http.routers.dashboard.middlewares=auth"
-- "traefik.http.middlewares.auth.basicauth.users=Example:$$2a$$10$$Bls.hNkCW3m4lBz9a592IOfom6U0dmFvIP9UUz.4VWbWF0x8Kn3WG"
-```
-
-### Start
-
-To start traefik:
+4. Créer le réseau proxy-net
 
 ```bash
-docker compose up -d
+docker network create proxy-net
 ```
 
-### Stop
-
-To stop the container:
+5. Lancer le docker compose
 
 ```bash
-docker compose down
+docker compose up -d && docker compose logs -f
 ```
 
-### Logs
+6. Accéder à votre dashboard sur `https://proxy.domain.tld`
 
-To view live logs:
+7. Ajouter un service à Traefik
 
-```bash
-docker compose logs -f
+```yaml
+services:
+  whoami:
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: unless-stopped
+    labels:
+      # --- Traefik ---
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.domain.tld`)"
+      - "traefik.http.routers.whoami.service=whoami"
+      # Si vous utilisez un port autre que 80, vous devez le spécifier
+      # - "traefik.http.services.whoami.loadbalancer.server.port=8080"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
 ```
 
-You can go to check your website to:
-`https://traefik.example.com`
-And register with your user / password
+## Explications et modifications possibles
 
-### Example website
+### Pourquoi utiliser le plugin AddMissingHeaders ?
 
-1. Go to example dir: `traefik-docker-compose/example`
-2. Edit `.env` (remove .dist)
-```yml
-# The service name (for example "website")
-service=
-# The domain name (for example "website.domain.tld")
-domain=
+Le plugin AddMissingHeaders est un plugin qui ajoute les headers manquants à la réponse HTTP.
+Au contraire de traefik qui écrase les headers par défaut, le plugin AddMissingHeaders ajoute les headers manquants.
+Ce qui me permet d'avoir un score de A+ sur https://securityheaders.com/.
+
+![AddMissingHeaders](./docs/img/securityheaders_score.png)
+
+### Utilisez un DNS Challenge au lieu d'un HTTP Challenge
+
+Il faut modifier le fichier `traefik.yml` et remplacer le bloc suivant :
+(Ici j'utilise Scaleway pour le DNS Challenge)
+
+```diff
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      storage: acme.json
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+-     httpChallenge:
+-       entryPoint: web
++     dnsChallenge:
++       provider: scaleway
++       delayBeforeCheck: "0s"
 ```
-3. Launch : `docker compose up -d`
 
-## Need Help?
+Il faut aussi ajouter deux variables d'environnement dans le fichier `.env` et le docker compose :
 
-If you encounter any issues, need help, or have questions, please don't hesitate to reach out. You can create an [issue](https://github.com/Lindwen/traefik-docker-compose/issues/new) here on GitHub. We're here to assist you and improve this project based on your feedback.
+```diff
++ SCW_ACCESS_KEY=
++ SCW_SECRET_KEY=
+```
 
-### How to Create an Issue
-
-1. Click on the "Issues" tab at the top of this repository.
-2. Click the green "New Issue" button.
-3. Provide a descriptive title and detailed description of the problem you're facing or the help you need.
-4. Submit the issue, and we'll get back to you as soon as possible.
-
-Your feedback is valuable, and we appreciate your contributions to making this project better.
-
----
-
-### Thanks
-
-* [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
-* [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file
+```diff
+environment:
++   - SCW_ACCESS_KEY=${SCW_ACCESS_KEY}
++   - SCW_SECRET_KEY=${SCW_SECRET_KEY}
+```
