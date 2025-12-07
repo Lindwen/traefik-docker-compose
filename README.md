@@ -1,97 +1,120 @@
 # traefik-docker-compose
 
-Streamline microservices deployment with Traefik and Docker Compose.
-And secure your website with security headers.
+Ce repository contient ma configuration de Traefik pour mon serveur.
+Vous pouvez aussi l'utiliser pour votre serveur.
 
-## Traefik
+## Utilisation
 
-Traefik is a modern HTTP reverse proxy and load balancer that makes deploying microservices easy. Traefik integrates with your existing infrastructure components and configures itself automatically and dynamically.
-
-## Docker Compose
-
-Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services.
-
-## Usage
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-
-### Configuration
-
-1. Clone the repository and navigate to it:
+1. Cloner le repository
 
 ```bash
+# HTTPS
 git clone https://github.com/Lindwen/traefik-docker-compose.git
+# SSH
+git clone git@github.com:Lindwen/traefik-docker-compose.git
+
 cd traefik-docker-compose
 ```
 
-1. Create `acme.json` file for traefik:
+2. Créer un fichier `.env`
+
+```bash
+cp .env.example .env
+vi .env
+```
+
+```env
+DOMAIN=proxy.domain.tld
+USERNAME=admin
+PASSWORD=
+```
+
+- `DOMAIN` : le domaine de votre proxy
+- `USERNAME` : le nom d'utilisateur de votre dashboard
+- `PASSWORD` : le mot de passe de votre dashboard (généré avec htpasswd et double $)
+
+3. Créer un fichier `acme.json`
 
 ```bash
 touch acme.json
 chmod 600 acme.json
 ```
 
-2. Copy `.env.example` to `.env` and edit the variables
+4. Créer le réseau proxy-net
 
 ```bash
-cp .env.example .env
+docker network create proxy-net
 ```
 
-3. Edit `traefik.yml` and `configurations/security-headers.yml` and `configurations/tls.yml` to your needs
-
-### Start
-
-To start traefik:
+5. Lancer le docker compose
 
 ```bash
-docker compose up -d
+docker compose up -d && docker compose logs -f
 ```
 
-### Stop
+6. Accéder à votre dashboard sur `https://proxy.domain.tld`
 
-To stop the container:
+7. Ajouter un service à Traefik
 
-```bash
-docker compose down
+```yaml
+services:
+  whoami:
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: unless-stopped
+    labels:
+      # --- Traefik ---
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.domain.tld`)"
+      - "traefik.http.routers.whoami.service=whoami"
+      # Si vous utilisez un port autre que 80, vous devez le spécifier
+      # - "traefik.http.services.whoami.loadbalancer.server.port=8080"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
 ```
 
-### Logs
+## Explications et modifications possibles
 
-To view live logs:
+### Pourquoi utiliser le plugin AddMissingHeaders ?
 
-```bash
-docker compose logs -f
+Le plugin AddMissingHeaders est un plugin qui ajoute les headers manquants à la réponse HTTP.
+Au contraire de traefik qui écrase les headers par défaut, le plugin AddMissingHeaders ajoute les headers manquants.
+Ce qui me permet d'avoir un score de A+ sur https://securityheaders.com/.
+
+![AddMissingHeaders](./docs/img/securityheaders_score.png)
+
+### Utilisez un DNS Challenge au lieu d'un HTTP Challenge
+
+Il faut modifier le fichier `traefik.yml` et remplacer le bloc suivant :
+(Ici j'utilise Scaleway pour le DNS Challenge)
+
+```diff
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      storage: acme.json
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+-     httpChallenge:
+-       entryPoint: web
++     dnsChallenge:
++       provider: scaleway
++       delayBeforeCheck: "0s"
 ```
 
-You can go to check your website to:
-`https://${DOMAIN}`
-And register with your user / password
+Il faut aussi ajouter deux variables d'environnement dans le fichier `.env` et le docker compose :
 
-### Add a service to the proxy
+```diff
++ SCW_ACCESS_KEY=
++ SCW_SECRET_KEY=
+```
 
-Need to be written.
-
-## Need Help?
-
-If you encounter any issues, need help, or have questions, please don't hesitate to reach out. You can create an [issue](https://github.com/Lindwen/traefik-docker-compose/issues/new) here on GitHub. We're here to assist you and improve this project based on your feedback.
-
-### How to Create an Issue
-
-1. Click on the "Issues" tab at the top of this repository.
-2. Click the green "New Issue" button.
-3. Provide a descriptive title and detailed description of the problem you're facing or the help you need.
-4. Submit the issue, and we'll get back to you as soon as possible.
-
-Your feedback is valuable, and we appreciate your contributions to making this project better.
-
----
-
-### Thanks
-
-- [PaulsBlog](https://www.paulsblog.dev/harden-your-website-with-traefik-and-security-headers/) - for the security headers
-- [Solution-Libre](https://github.com/solution-libre/docker-traefik) - for the TLS file
+```diff
+environment:
++   - SCW_ACCESS_KEY=${SCW_ACCESS_KEY}
++   - SCW_SECRET_KEY=${SCW_SECRET_KEY}
+```

@@ -40,6 +40,11 @@ certificatesResolvers:
     acme:
       storage: acme.json
       caServer: https://acme-v02.api.letsencrypt.org/directory
-      dnsChallenge:
-        provider: scaleway
-        delayBeforeCheck: "0s"
+      httpChallenge:
+        entryPoint: web
+
+experimental:
+  plugins:
+    AddMissingHeaders:
+      moduleName: github.com/jerrywoo96/AddMissingHeaders
+      version: v1.1.2
