@@ -22,6 +22,7 @@ entryPoints:
     http:
       middlewares:
         - security-headers@file
+        - AddMissingHeaders@file
       tls:
         certResolver: letsencrypt
         options: tls@file
