@@ -82,8 +82,10 @@ networks:
 
 ### Pourquoi utiliser le plugin AddMissingHeaders ?
 
-Le plugin AddMissingHeaders est un plugin qui ajoute les headers manquants à la réponse HTTP.
+Le plugin AddMissingHeaders est un plugin qui permet d'ajouter des headers à une requête ou une réponse HTTP.
+Son fichier de configuration est dans le dossier `configurations/AddMissingHeaders.yml`.
 Au contraire de traefik qui écrase les headers par défaut, le plugin AddMissingHeaders ajoute les headers manquants.
+C'est pour cela que les valeurs dans le fichier `configurations/security-headers.yml` sont en commentaire, sinon les sites derrière le proxy ne fonctionneraient pas.
 Ce qui me permet d'avoir un score de A+ sur https://securityheaders.com/.
 
 ![AddMissingHeaders](./docs/img/securityheaders_score.png)
