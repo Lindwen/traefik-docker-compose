@@ -6,8 +6,16 @@ http:
           requestHeaders:
           responseHeaders:
             Strict-Transport-Security: "max-age=63072000; includeSubDomains; preload"
-            Permissions-Policy: "camera=(), geolocation=(), microphone=(), payment=(), usb=(), vr=()"
-            Content-Security-Policy: "default-src https:"
+            Permissions-Policy: "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+            Content-Security-Policy: >
+              default-src 'self' https:;
+              script-src 'self' 'unsafe-inline' https:;
+              style-src 'self' 'unsafe-inline' https:;
+              img-src 'self' data: https:;
+              font-src 'self' https:;
+              connect-src 'self' https:;
+              frame-ancestors 'self';
+              object-src 'none';
             X-Frame-Options: "SAMEORIGIN"
             X-Content-Type-Options: "nosniff"
             Referrer-Policy: no-referrer
