@@ -66,7 +66,6 @@ services:
       # --- Traefik ---
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.domain.tld`)"
-      - "traefik.http.routers.whoami.service=whoami"
       # Si vous utilisez un port autre que 80, vous devez le spécifier
       # - "traefik.http.services.whoami.loadbalancer.server.port=8080"
       - "traefik.http.routers.whoami.entrypoints=websecure"
